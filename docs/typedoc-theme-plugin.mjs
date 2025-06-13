@@ -1,7 +1,7 @@
-const { JSX, ParameterType } = require("typedoc");
+import { JSX, ParameterType } from "typedoc";
 
 /** @param {import("typedoc").Application} app */
-exports.load = function load(app) {
+export function load(app) {
     app.options.addDeclaration({ name: "modules", type: ParameterType.Array, elementType: "string" });
 
     app.renderer.hooks.on("sidebar.begin", () => {
@@ -33,4 +33,4 @@ exports.load = function load(app) {
             }),
         );
     });
-};
+}

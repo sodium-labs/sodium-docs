@@ -1,5 +1,4 @@
 const fs = require("node:fs");
-const td = require("typedoc");
 
 const modules = ["plume-api.js", "plume-url.js", "gdapi"];
 
@@ -8,6 +7,8 @@ if (!fs.existsSync("docs/assets")) {
 }
 
 const buildModuleDocs = async name => {
+    const td = await import("typedoc");
+
     const date = new Intl.DateTimeFormat("en-US", {
         dateStyle: "full",
         timeStyle: "short",
@@ -29,7 +30,7 @@ const buildModuleDocs = async name => {
         modules,
         customJs: `./docs/assets/custom-${name}.js`,
         customCss: "./docs/custom.css",
-        plugin: ["typedoc-material-theme", "typedoc-plugin-zod", "./docs/typedoc-theme-plugin.js"],
+        plugin: ["typedoc-material-theme", "typedoc-plugin-zod", "./docs/typedoc-theme-plugin.mjs"],
         themeColor: "#7499d6",
         gitRemote: `https://github.com/sodium-labs/${name}.git`,
         sourceLinkTemplate: `https://github.com/sodium-labs/${name}/blob/main/{path}#L{line}`,
