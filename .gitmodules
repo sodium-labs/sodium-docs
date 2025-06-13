@@ -1,0 +1,9 @@
+[submodule "modules/plume-api.js"]
+	path = modules/plume-api.js
+	url = https://github.com/sodium-labs/plume-api.js
+[submodule "modules/plume-url.js"]
+	path = modules/plume-url.js
+	url = https://github.com/sodium-labs/plume-url.js
+[submodule "modules/gdapi"]
+	path = modules/gdapi
+	url = https://github.com/sodium-labs/gdapi
