@@ -16,3 +16,6 @@ public/docs
 
 # env files
 .env
+
+# misc
+*.zip
