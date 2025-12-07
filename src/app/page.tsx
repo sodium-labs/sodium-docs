@@ -5,6 +5,7 @@ import GitHubIcon from "@/icons/brands/GitHubIcon";
 import SodiumLabsIcon from "@/icons/brands/SodiumLabsIcon";
 import { DISCORD_URL, GITHUB_URL, SODIUM_LABS_URL, STATUS_URL } from "@/config";
 import { modules } from "@/modules";
+import Link from "next/link";
 
 export default function Home() {
     return (
@@ -27,15 +28,17 @@ export default function Home() {
                 </ol>
 
                 <div className="mx-auto flex flex-col items-center gap-4 sm:flex-row">
-                    <a
+                    <Link
+                        prefetch={false}
                         className="bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent px-4 text-sm font-medium transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]"
                         href={`/${modules[0]}`}
                         rel="noopener noreferrer"
                     >
                         <BookIcon />
                         Read our docs
-                    </a>
-                    <a
+                    </Link>
+                    <Link
+                        prefetch={false}
                         className="flex h-10 w-full items-center justify-center gap-2 rounded-full border border-solid border-black/[.08] px-4 text-sm font-medium transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
                         href={GITHUB_URL}
                         target="_blank"
@@ -43,12 +46,13 @@ export default function Home() {
                     >
                         <GitHubIcon className="size-6" />
                         View our GitHub
-                    </a>
+                    </Link>
                 </div>
             </main>
 
             <footer className="row-start-3 flex flex-wrap items-center justify-center gap-[24px]">
-                <a
+                <Link
+                    prefetch={false}
                     className="flex items-center gap-2 hover:underline hover:underline-offset-4"
                     href={SODIUM_LABS_URL}
                     target="_blank"
@@ -56,8 +60,9 @@ export default function Home() {
                 >
                     <SodiumLabsIcon />
                     Sodium Labs
-                </a>
-                <a
+                </Link>
+                <Link
+                    prefetch={false}
                     className="flex items-center gap-2 hover:underline hover:underline-offset-4"
                     href={STATUS_URL}
                     target="_blank"
@@ -65,8 +70,9 @@ export default function Home() {
                 >
                     <RssIcon />
                     Status
-                </a>
-                <a
+                </Link>
+                <Link
+                    prefetch={false}
                     className="flex items-center gap-2 hover:underline hover:underline-offset-4"
                     href={DISCORD_URL}
                     target="_blank"
@@ -74,7 +80,7 @@ export default function Home() {
                 >
                     <DiscordIcon />
                     Discord
-                </a>
+                </Link>
             </footer>
         </div>
     );

@@ -1,3 +1,14 @@
+@font-face {
+    font-family: "Manrope";
+    src: url("/fonts/manrope/Manrope-VariableFont_wght.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+}
+
+body {
+    --font-sans: "Manrope", sans-serif;
+}
+
 .custom-module-selector {
     padding-top: 0rem;
     padding-bottom: 0.8rem;
