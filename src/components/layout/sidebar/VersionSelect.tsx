@@ -18,6 +18,17 @@ export function VersionSelect({
 
     const entryPoint = PACKAGES_WITH_ENTRY_POINTS.find(([n]) => n === params.packageName);
 
+    const sortedVersions = versions
+        .map(v => v.version)
+        .toSorted((a, b) => {
+            const [majorA, minorA, patchA] = a.split(".").map(Number);
+            const [majorB, minorB, patchB] = b.split(".").map(Number);
+
+            if (majorA !== majorB) return majorB - majorA;
+            if (minorA !== minorB) return minorB - minorA;
+            return patchB - patchA;
+        });
+
     return (
         <Select
             disabled={isLoading}
@@ -52,12 +63,10 @@ export function VersionSelect({
                 )}
             </SelectTrigger>
             <SelectContent position="popper">
-                {versions.map(item => (
-                    <SelectItem value={item.version} key={item.version}>
-                        <span
-                            onMouseEnter={() => router.prefetch(`/docs/packages/${params.packageName}/${item.version}`)}
-                        >
-                            {item.version}
+                {sortedVersions.map(version => (
+                    <SelectItem value={version} key={version}>
+                        <span onMouseEnter={() => router.prefetch(`/docs/packages/${params.packageName}/${version}`)}>
+                            {version}
                         </span>
                     </SelectItem>
                 ))}
