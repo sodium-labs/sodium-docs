@@ -19,7 +19,8 @@ In the future, these generated files will likely be stored in a database, but th
 
 - The documentation is currently designed for TypeScript, but we may add support for other languages in the future.
 
-## Source
+## Credits
 
-A portion of this repository is derived from the
-[discord.js docs website](https://github.com/discordjs/discord.js/blob/main/apps/website/README.md). Most files have been reworked, mainly because our docs generation works differently.
+This project also partially contains code derived or copied from the following projects:
+
+- [discord.js website](https://github.com/discordjs/discord.js/blob/main/apps/website/README.md)
