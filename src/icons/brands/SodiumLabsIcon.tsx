@@ -2,8 +2,8 @@ export default function SodiumLabsIcon({ className }: { className?: string }) {
     return (
         <svg
             className={className}
-            width="24"
-            height="24"
+            width={16}
+            height={16}
             viewBox="163.37459141199443 126.77369525126942 223.25081717601117 110.93929768543647"
         >
             <defs>

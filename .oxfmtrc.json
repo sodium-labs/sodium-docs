@@ -4,5 +4,5 @@
     "arrowParens": "avoid",
     "tabWidth": 4,
     "useTabs": false,
-    "ignorePatterns": ["node_modules", ".next", "dist", "package-lock.json", "modules"]
+    "ignorePatterns": ["node_modules", ".next", "/docs", "dist", "package-lock.json"]
 }
