@@ -20,6 +20,7 @@ export const SODIUM_LABS_NPM_USER = "@sodiumlabs";
 export const PACKAGES = [
     { user: SODIUM_LABS_URL, name: "plume-api", repository: "sodium-labs/plume-api.js" },
     { user: SODIUM_LABS_URL, name: "plume-url", repository: "sodium-labs/plume-url.js" },
+    { user: SODIUM_LABS_URL, name: "gamecord" },
     { user: SODIUM_LABS_URL, name: "gdapi" },
 ];
 
