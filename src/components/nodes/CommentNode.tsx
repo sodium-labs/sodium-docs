@@ -13,7 +13,7 @@ export async function CommentNode({ node, version }: { readonly node?: KindTextE
 
         switch (node.kind) {
             case "PlainText":
-                return (_oldKind === "PlainText" ? "\n\n" : "") + node.text;
+                return (_oldKind === "PlainText" || _oldKind === "FencedCode" ? "\n\n" : "") + node.text;
             case "LinkTag": {
                 if (node.resolvedPackage) {
                     return `[${node.text}](/docs/packages/${node.resolvedPackage.packageName}/${node.resolvedPackage.version ?? version}/${node.uri})`;
@@ -34,7 +34,7 @@ export async function CommentNode({ node, version }: { readonly node?: KindTextE
                 return "`" + node.text + "`";
             case "FencedCode": {
                 const { language, text } = node;
-                return "```" + language + "\n" + text + "\n```";
+                return (oldKind === "" ? "" : "\n\n") + "```" + (language || "") + "\n" + text + "\n```";
             }
             case "SoftBreak":
                 return null;
