@@ -22,6 +22,9 @@ export const PACKAGES = [
     { user: SODIUM_LABS_URL, name: "plume-url", repository: "sodium-labs/plume-url.js" },
     { user: SODIUM_LABS_URL, name: "gamecord" },
     { user: SODIUM_LABS_URL, name: "gdapi" },
+    { user: SODIUM_LABS_URL, name: "ms" },
+    { user: SODIUM_LABS_URL, name: "snowflake" },
+    { user: SODIUM_LABS_URL, name: "duration" },
 ];
 
 /**
