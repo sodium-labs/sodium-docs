@@ -2,7 +2,15 @@ import { BuiltinDocumentationLinks } from "@/lib/docs/builtinLinks";
 import { KindTextElement } from "@/lib/docs/types";
 import { Markdown } from "../Markdown";
 
-export async function CommentNode({ node, version }: { readonly node?: KindTextElement[]; readonly version: string }) {
+export async function CommentNode({
+    node,
+    version,
+    className,
+}: {
+    readonly node?: KindTextElement[];
+    readonly version: string;
+    className?: string;
+}) {
     let oldKind = "";
     let key = "";
 
@@ -45,5 +53,9 @@ export async function CommentNode({ node, version }: { readonly node?: KindTextE
 
     const markdown = node?.map(createNode).filter(s => s !== null) ?? null;
 
-    return <Markdown small>{markdown?.join("")}</Markdown>;
+    return (
+        <Markdown small className={className}>
+            {markdown?.join("")}
+        </Markdown>
+    );
 }

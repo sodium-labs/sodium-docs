@@ -18,6 +18,8 @@ import { UnstableNode } from "./UnstableNode";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { ContentSeparator } from "../ContentSeparator";
 import { OverloadNode } from "./OverloadNode";
+import { ThrowsNode } from "./ThrowsNode";
+import { ParameterCommentNode } from "./ParameterCommentNode";
 
 export async function MethodNode({
     node,
@@ -144,8 +146,14 @@ async function MethodBodyNode({
                     <ExampleNode node={method.summary.exampleBlocks} version={version} />
                 ) : null}
 
+                <ParameterCommentNode node={method.parameters} version={version} padding />
+
                 {method.summary?.returnsBlock.length ? (
                     <ReturnNode node={method.summary.returnsBlock} padding version={version} />
+                ) : null}
+
+                {method.summary?.throwsBlocks?.length ? (
+                    <ThrowsNode node={method.summary.throwsBlocks} padding version={version} />
                 ) : null}
 
                 {method.inheritedFrom ? (

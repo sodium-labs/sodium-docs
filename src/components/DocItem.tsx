@@ -21,6 +21,7 @@ import { SyntaxHighlighter } from "./SyntaxHighlighter";
 import { ExampleNode } from "./nodes/ExampleNode";
 import { RemarksNode } from "./nodes/RemarksNode";
 import { ThrowsNode } from "./nodes/ThrowsNode";
+import { ParameterCommentNode } from "./nodes/ParameterCommentNode";
 
 async function OverloadNode({
     node,
@@ -101,6 +102,8 @@ export async function DocItem({
             {node.summary?.exampleBlocks.length ? (
                 <ExampleNode node={node.summary.exampleBlocks} version={version} />
             ) : null}
+
+            {"parameters" in node ? <ParameterCommentNode node={node.parameters} version={version} /> : null}
 
             {node.summary?.returnsBlock.length ? (
                 <ReturnNode node={node.summary.returnsBlock} version={version} />

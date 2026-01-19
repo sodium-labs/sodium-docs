@@ -9,6 +9,7 @@ import { ParameterNode } from "./ParameterNode";
 import { SeeNode } from "./SeeNode";
 import { SummaryNode } from "./SummaryNode";
 import { ContentSeparator } from "../ContentSeparator";
+import { ParameterCommentNode } from "./ParameterCommentNode";
 
 export async function ConstructorNode({ node, version }: { readonly node: Constructor; readonly version: string }) {
     return (
@@ -53,6 +54,8 @@ export async function ConstructorNode({ node, version }: { readonly node: Constr
             {node.summary?.exampleBlocks.length ? (
                 <ExampleNode node={node.summary.exampleBlocks} version={version} />
             ) : null}
+
+            <ParameterCommentNode node={node.parameters} version={version} padding />
 
             {node.summary?.seeBlocks.length ? (
                 <SeeNode node={node.summary.seeBlocks} padding version={version} />
