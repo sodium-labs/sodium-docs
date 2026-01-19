@@ -50,8 +50,14 @@ import {
     type ModuleSource,
 } from "@microsoft/tsdoc/lib-commonjs/beta/DeclarationReference.js";
 import { BuiltinDocumentationLinks } from "../src/lib/docs/builtinLinks";
-import { SODIUM_LABS_NPM_USER } from "../src/lib/constants";
+import { PACKAGES, SODIUM_LABS_NPM_USER } from "../src/lib/constants";
 import { Event } from "../src/lib/docs/types";
+
+interface Options {
+    version: string;
+    packageName: string;
+    monorepo?: string;
+}
 
 function findMemberByKey(entry: ApiEntryPoint, containerKey: string) {
     return entry.tryGetMemberByKey(containerKey);
@@ -421,6 +427,10 @@ function itemTsDoc(item: DocNode, apiItem: ApiItem) {
                     block => block.blockTag.tagNameWithUpperCase === "@MIXES",
                 );
 
+                const throwsBlocks = comment.customBlocks.filter(
+                    block => block.blockTag.tagNameWithUpperCase === "@THROWS",
+                );
+
                 return {
                     kind: DocNodeKind.Comment,
                     deprecatedBlock: comment.deprecatedBlock
@@ -462,6 +472,9 @@ function itemTsDoc(item: DocNode, apiItem: ApiItem) {
                     mixesBlocks: mixesBlocks
                         .flatMap(block => createNode(block.content).flat(1))
                         .filter((val: any) => val.kind !== DocNodeKind.SoftBreak),
+                    throwsBlocks: throwsBlocks
+                        .flatMap(block => createNode(block.content).flat(1))
+                        .filter((val: any) => val.kind !== DocNodeKind.SoftBreak),
                 };
             }
 
@@ -477,9 +490,9 @@ function itemTsDoc(item: DocNode, apiItem: ApiItem) {
         : createNode(item);
 }
 
-function itemInfo(item: ApiDeclaredItem, version: string) {
+function itemInfo(item: ApiDeclaredItem, options: Options) {
     const sourceExcerpt = item.excerpt.text.trim();
-    const { sourceURL, sourceLine } = resolveFileUrl(item, version);
+    const { sourceURL, sourceLine } = resolveFileUrl(item, options);
 
     const isStatic = ApiStaticMixin.isBaseClassOf(item) && item.isStatic;
     const isProtected = ApiProtectedMixin.isBaseClassOf(item) && item.isProtected;
@@ -507,13 +520,19 @@ function itemInfo(item: ApiDeclaredItem, version: string) {
     };
 }
 
-function resolveFileUrl(item: ApiDeclaredItem, version: string) {
+function resolveFileUrl(item: ApiDeclaredItem, options: Options) {
     const {
         sourceLocation: { _projectFolderUrl, _fileUrlPath },
     } = item;
 
+    const tag = options.monorepo
+        ? encodeURIComponent(`${SODIUM_LABS_NPM_USER}/${options.packageName}@${options.version}`)
+        : `v${options.version}`;
+
     return {
-        sourceURL: `${_projectFolderUrl}/tree/v${version}/${_fileUrlPath}`,
+        sourceURL: options.monorepo
+            ? `${_projectFolderUrl}/tree/${tag}/packages/${options.packageName}/${_fileUrlPath}`
+            : `${_projectFolderUrl}/tree/${tag}/${_fileUrlPath}`,
         sourceLine: -1,
     };
 }
@@ -594,9 +613,9 @@ function itemParameters(item: ApiDocumentedItem & ApiParameterListMixin) {
     }));
 }
 
-function itemConstructor(item: ApiConstructor, version: string) {
+function itemConstructor(item: ApiConstructor, options: Options) {
     return {
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         parametersString: parametersString(item),
         parameters: itemParameters(item),
     };
@@ -606,14 +625,14 @@ function isPropertyLike(item: ApiItem): item is ApiProperty | ApiPropertySignatu
     return item.kind === ApiItemKind.Property || item.kind === ApiItemKind.PropertySignature;
 }
 
-function itemProperty(item: ApiItemContainerMixin, version: string) {
+function itemProperty(item: ApiItemContainerMixin, options: Options) {
     const members = resolveMembers(item, isPropertyLike);
 
     return members.map(property => {
         const hasSummary = Boolean(property.item.tsdocComment?.summarySection);
 
         return {
-            ...itemInfo(property.item, version),
+            ...itemInfo(property.item, options),
             inheritedFrom: property.inherited ? resolveItemURI(property.inherited) : null,
             typeExcerpt: itemExcerptText(
                 property.item.propertyTypeExcerpt,
@@ -642,7 +661,7 @@ function isMethodLike(item: ApiItem): item is ApiMethod | ApiMethodSignature {
     );
 }
 
-function itemMethod(item: ApiItemContainerMixin, version: string) {
+function itemMethod(item: ApiItemContainerMixin, options: Options) {
     const members = resolveMembers(item, isMethodLike);
 
     const methodItem = (method: {
@@ -652,7 +671,7 @@ function itemMethod(item: ApiItemContainerMixin, version: string) {
         const hasSummary = Boolean(method.item.tsdocComment?.summarySection);
 
         return {
-            ...itemInfo(method.item, version),
+            ...itemInfo(method.item, options),
             overloadIndex: method.item.overloadIndex,
             parametersString: parametersString(method.item),
             returnTypeExcerpt: itemExcerptText(
@@ -687,9 +706,9 @@ function itemMethod(item: ApiItemContainerMixin, version: string) {
     });
 }
 
-function itemMembers(item: ApiDeclaredItem & ApiItemContainerMixin, version: string) {
-    const properties = hasProperties(item) ? itemProperty(item, version) : [];
-    let methods = hasMethods(item) ? itemMethod(item, version) : [];
+function itemMembers(item: ApiDeclaredItem & ApiItemContainerMixin, options: Options) {
+    const properties = hasProperties(item) ? itemProperty(item, options) : [];
+    let methods = hasMethods(item) ? itemMethod(item, options) : [];
     const events: Event[] = [];
 
     // If this class (or any ancestor) exposes an `on` method, extract it
@@ -809,24 +828,24 @@ export function itemHierarchyText({
     }));
 }
 
-function itemClass(item: ApiClass, version: string) {
+function itemClass(item: ApiClass, options: Options) {
     const constructor = item.members.find(member => member.kind === ApiItemKind.Constructor) as
         | ApiConstructor
         | undefined;
 
     return {
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         extends: itemHierarchyText({ item, type: "Extends" }),
         implements: itemHierarchyText({ item, type: "Implements" }),
         typeParameters: itemTypeParameters(item),
-        construct: constructor ? itemConstructor(constructor, version) : null,
-        members: itemMembers(item, version),
+        construct: constructor ? itemConstructor(constructor, options) : null,
+        members: itemMembers(item, options),
     };
 }
 
-function itemFunction(item: ApiFunction, version: string) {
+function itemFunction(item: ApiFunction, options: Options) {
     const functionItem = (item: ApiFunction) => ({
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         overloadIndex: item.overloadIndex,
         typeParameters: itemTypeParameters(item),
         parameters: itemParameters(item),
@@ -841,12 +860,12 @@ function itemFunction(item: ApiFunction, version: string) {
     };
 }
 
-function itemInterface(item: ApiInterface, version: string) {
+function itemInterface(item: ApiInterface, options: Options) {
     return {
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         extends: itemHierarchyText({ item, type: "Extends" }),
         typeParameters: itemTypeParameters(item),
-        members: itemMembers(item, version),
+        members: itemMembers(item, options),
     };
 }
 
@@ -891,9 +910,9 @@ function itemUnion(item: Excerpt) {
     return union;
 }
 
-function itemTypeAlias(item: ApiTypeAlias, version: string) {
+function itemTypeAlias(item: ApiTypeAlias, options: Options) {
     return {
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         typeParameters: itemTypeParameters(item),
         unionMembers: itemUnion(item.typeExcerpt).map(member =>
             itemExcerptText(
@@ -905,9 +924,9 @@ function itemTypeAlias(item: ApiTypeAlias, version: string) {
     };
 }
 
-function itemVariable(item: ApiVariable, version: string) {
+function itemVariable(item: ApiVariable, options: Options) {
     return {
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         unionMembers: itemUnion(item.variableTypeExcerpt).map(member =>
             itemExcerptText(
                 new Excerpt(member, { startIndex: 0, endIndex: member.length }),
@@ -918,9 +937,9 @@ function itemVariable(item: ApiVariable, version: string) {
     };
 }
 
-function itemEnumMember(item: ApiEnumMember, version: string) {
+function itemEnumMember(item: ApiEnumMember, options: Options) {
     return {
-        ...itemInfo(item, version),
+        ...itemInfo(item, options),
         name: item.name,
         initializerExcerpt: item.initializerExcerpt
             ? itemExcerptText(item.initializerExcerpt, item.getAssociatedPackage()!)
@@ -928,44 +947,44 @@ function itemEnumMember(item: ApiEnumMember, version: string) {
     };
 }
 
-function itemEnum(item: ApiEnum, version: string) {
+function itemEnum(item: ApiEnum, options: Options) {
     return {
-        ...itemInfo(item, version),
-        members: item.members.map(member => itemEnumMember(member, version)),
+        ...itemInfo(item, options),
+        members: item.members.map(member => itemEnumMember(member, options)),
     };
 }
 
-function memberKind(member: ApiItem | null, version: string) {
+function memberKind(member: ApiItem | null, options: Options) {
     // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (member?.kind) {
         case "Class": {
             const classMember = member as ApiClass;
-            return itemClass(classMember, version);
+            return itemClass(classMember, options);
         }
 
         case "Function": {
             const functionMember = member as ApiFunction;
-            return itemFunction(functionMember, version);
+            return itemFunction(functionMember, options);
         }
 
         case "Interface": {
             const interfaceMember = member as ApiInterface;
-            return itemInterface(interfaceMember, version);
+            return itemInterface(interfaceMember, options);
         }
 
         case "TypeAlias": {
             const typeAliasMember = member as ApiTypeAlias;
-            return itemTypeAlias(typeAliasMember, version);
+            return itemTypeAlias(typeAliasMember, options);
         }
 
         case "Variable": {
             const variableMember = member as ApiVariable;
-            return itemVariable(variableMember, version);
+            return itemVariable(variableMember, options);
         }
 
         case "Enum": {
             const enumMember = member as ApiEnum;
-            return itemEnum(enumMember, version);
+            return itemEnum(enumMember, options);
         }
 
         default:
@@ -1067,6 +1086,12 @@ export async function generateSplitDocumentation(input: { packageName: string; v
                     entry: entry.importPath,
                 });
 
+                const options: Options = {
+                    version,
+                    packageName: pkgName,
+                    monorepo: PACKAGES.find(p => p.name === pkgName)?.monorepo,
+                };
+
                 for (const member of members) {
                     const item = `${member.name}:${member.kind}`;
                     const [memberName, overloadIndex] = decodeURIComponent(item).split(":");
@@ -1080,7 +1105,7 @@ export async function generateSplitDocumentation(input: { packageName: string; v
                     const foundMember =
                         memberName && containerKey ? (findMemberByKey(entry, containerKey) ?? null) : null;
 
-                    const returnValue = memberKind(foundMember, version);
+                    const returnValue = memberKind(foundMember, options);
 
                     if (!returnValue) {
                         continue;

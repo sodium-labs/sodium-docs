@@ -179,6 +179,7 @@ export interface CommentBlock {
     exampleBlocks: KindTextElement[];
     seeBlocks: KindTextElement[];
     mixesBlocks: KindTextElement[];
+    throwsBlocks: KindTextElement[];
 }
 
 export interface Overload extends BaseNode {}

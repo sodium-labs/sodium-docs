@@ -20,6 +20,7 @@ import { UnstableNode } from "./nodes/UnstableNode";
 import { SyntaxHighlighter } from "./SyntaxHighlighter";
 import { ExampleNode } from "./nodes/ExampleNode";
 import { RemarksNode } from "./nodes/RemarksNode";
+import { ThrowsNode } from "./nodes/ThrowsNode";
 
 async function OverloadNode({
     node,
@@ -103,6 +104,10 @@ export async function DocItem({
 
             {node.summary?.returnsBlock.length ? (
                 <ReturnNode node={node.summary.returnsBlock} version={version} />
+            ) : null}
+
+            {node.summary?.throwsBlocks?.length ? (
+                <ThrowsNode node={node.summary.throwsBlocks} version={version} />
             ) : null}
 
             {node.summary?.seeBlocks.length ? <SeeNode node={node.summary.seeBlocks} version={version} /> : null}
